@@ -1,5 +1,5 @@
 # rapidmail-api 
-## Python Module for the Newsletter Tool
+## Python Module for the Newsletter Tool Rapidmail
 -----
 
 **rapidmail-api** is a Python library for dealing with the [Rapidmail](https://www.rapidmail.de) Newsletter Tool API.  
