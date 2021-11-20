@@ -14,6 +14,7 @@ from requests.auth import HTTPBasicAuth
 
 # Additional Libraries
 import json
+from datetime import datetime
 
 # CONFIGURATION
 config=dotenv_values(".env") # config = {"RAPIDMAIL_USERNAME" : "username", "RAPIDMAIL_PASSWORD" : "password"}
@@ -23,23 +24,26 @@ class APIBasic():
      def __init__(self) -> None:
           self.base_url="https://apiv3.emailsys.net"
 
+     def __str__(self) -> str:
+          # sends request and prints connection status to the console
+          response=self.get_request(f"{self.base_url}/v1/apiusers")
+          return f" Connection status: {response.status_code} - {response.reason}"
+
+
      def get_request(self, endpoint):
                # returns response of requests as object
                return requests.get(endpoint, auth=HTTPBasicAuth(config['RAPIDMAIL_USERNAME'], config['RAPIDMAIL_PASSWORD']))
 
-     def conn_stat(self, response):
-          # prints connection status to the console
-          print(f" Connection status: {response.status_code} - {response.reason}")
+     def get_request_params(self, endpoint, query_params):
+               # returns response of requests as object
+               return requests.get(endpoint, params=query_params, auth=HTTPBasicAuth(config['RAPIDMAIL_USERNAME'], config['RAPIDMAIL_PASSWORD']))
 
-     def get_api_users(self):
-          # basic method returning list of API users to object variable api_uses
-          endpoint_spec='/v1/apiusers' # specific endpoint addition to base URL
-          endpoint=self.base_url+endpoint_spec
-          return self.get_request(endpoint).json()
 
      def list_api_users(self):
           # fetch and list all api users by ID, Name and Last Updated Timestamp
-          api_user_list=self.get_api_users()
+          endpoint_spec='/v1/apiusers' # specific endpoint addition to base URL
+          endpoint=self.base_url+endpoint_spec
+          api_user_list=self.get_request(endpoint).json()
           for api_user in api_user_list['_embedded']['apiusers']:
                print(f"{api_user['id']} - {api_user['description']} - last updated: {api_user['updated']}")
           
@@ -55,9 +59,78 @@ class APIUser(APIBasic):
 
      def __str__(self) -> str:
           return f"{self.api_user['id']} - {self.api_user['description']} - last updated: {self.api_user['updated']}"
-          
 
-print(APIUser(10345))
+class Blacklist(APIBasic):
+     """
+     Class handling blacklist entries
+     """
+     def __init__(self) -> None:
+         super().__init__()
+         endpoint_spec="/v1/blacklist"
+         endpoint=self.base_url+endpoint_spec
+         self.blacklist=self.get_request(endpoint).json()
+
+     def __str__(self) -> str:
+         return super().__str__()
+
+
+class Forms(APIBasic):
+     """
+     Class handling form lists
+     """
+     def __init__(self) -> None:
+         super().__init__()
+         endpoint_spec="/v2/forms"
+         endpoint=self.base_url+endpoint_spec
+         self.forms_list=self.get_request(endpoint).json()
+
+
+class Recipientlists(APIBasic):
+     """
+     Class handling recipientlists
+     """
+     def __init__(self) -> None:
+         super().__init__()
+         endpoint_spec="/v1/recipientlists"
+         endpoint=self.base_url+endpoint_spec
+         recipient_lists=self.get_request(endpoint).json()
+         for recipient_list in recipient_lists['_embedded']['recipientlists']:
+               if recipient_list['description'] == "":
+                    recipient_list['description']="No Description"
+               total=Recipientlist(recipient_list['id']).total
+               print(f"{recipient_list['id']} - {recipient_list['name']} ({recipient_list['description']}) - total Subs: {total}")
+
+class Recipientlist(APIBasic):
+     def __init__(self, list_id) -> None:
+          super().__init__()
+          endpoint_spec=f"/v1/recipientlists/{list_id}"
+          self.endpoint=self.base_url+endpoint_spec
+          self.recipientlist=self.get_request(self.endpoint).json()
+          self.creation_date=self.recipientlist['created'][0:10]
+          self.total=self.get_list_total()  
+          self.details=self.get_list_details().json()      
+
+     def get_list_total(self):
+          response=self.get_list_details()
+          return response.json()['total']
+     
+     def get_list_details(self):
+          today=datetime.today().strftime('%Y-%m-%d')
+          endpoint_spec=f"{self.endpoint}/stats/activity"
+          query_params={'from':self.creation_date, 'to':today, 'status':'active'}
+          return self.get_request_params(endpoint_spec, query_params)          
+
+
+########################################################################
+
+#print(APIBasic()) 
+#print(APIUser(10345))
+#print(Recipientlists())
+#print(json.dumps(Recipientlist(5613).details, indent=2))
+
+
+
+
 
 
 
