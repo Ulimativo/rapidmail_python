@@ -1,6 +1,6 @@
 ########################################
 # Python Module for the RapidMail API. #
-# v. 0.1 - Alpha                       #
+# v. 0.2 - Alpha                       #
 ########################################
 
 # IMPORTS
@@ -24,6 +24,21 @@ config = dotenv_values(".env")
 
 
 class APIBasic():
+    """ 
+    Basic API class handling API calls. 
+    
+    Methods
+    --------
+    get_request(endpoint=String)
+    returns API request, using given endpoint.
+
+    get_request(endpoint=String, query_params=Dict)
+    return API request, using given endpoint, with query parameters, given as dictionary.
+
+    list_api_users()
+    prints list of API users, including last time of update
+
+    """
     def __init__(self) -> None:
         self.base_url = "https://apiv3.emailsys.net"
         self.endpoint = {
@@ -59,6 +74,7 @@ class APIBasic():
 class APIUser(APIBasic):
     """
     Class representing API User information
+    returns User ID, Description and time of Last Update
     """
 
     def __init__(self, user_id) -> int:
@@ -73,6 +89,7 @@ class APIUser(APIBasic):
 class Blacklist(APIBasic):
     """
     Class handling blacklist entries
+    not implemented yet.
     """
 
     def __init__(self) -> None:
@@ -86,6 +103,7 @@ class Blacklist(APIBasic):
 class Forms(APIBasic):
     """
     Class handling form lists
+    not implemented yet
     """
 
     def __init__(self) -> None:
@@ -95,7 +113,9 @@ class Forms(APIBasic):
 
 class Recipientlists(APIBasic):
     """
-    Class handling recipientlists
+    Class handling recipientlists.
+    Prints list of all recipient lists, including:
+    ID, Name, Description, Total Subscribers
     """
 
     def __init__(self) -> None:
@@ -111,7 +131,9 @@ class Recipientlists(APIBasic):
 
 
 class Recipientlist(APIBasic):
-
+    """
+    Class providing details of a given recipient list id.
+    """
     def __init__(self, list_id) -> None:
         super().__init__()
         self.list_id = list_id
@@ -135,6 +157,7 @@ class Recipientlist(APIBasic):
 class Mailings(APIBasic):
     """
     Class representing Mailing object from API.
+
     """
 
     def __init__(self) -> None:
@@ -206,8 +229,6 @@ x include all pages - currently only reading page 1.
 
 ########################################################################
 # TESTING
-# print(Forms())
-# print(APIBasic().list_api_users())
 # print(APIUser(10345))
 # print(Recipientlists())
 #print(json.dumps(Recipientlist(5613).details, indent=2))
@@ -234,14 +255,11 @@ def save_recipients_stats(filename, list_id):
      return f"Finished, saved to file {filename}.csv"
 
 def main():
-    # print(save_mailing_stats('mailings'))
-    #print(json.dumps(Mailings().get_all_results, indent=2))
-    # test=Mailings()
-    #print(save_mailing_stats('testfull'))
-    #print(Recipientlist(5613).total)
-    #print(Recipientlists())
-     #print(json.dumps(Recipient(5677).details, indent=2))
-     print(save_recipients_stats('recipients',5677))
+    filename=input("What filename do you want to save the data to? ")
+    list_id=input("Which List ID to pull data from? ")
+    # list_id=5677
+    print(f"Data from {list_id} will be saved to {filename}.csv)")
+    print(save_recipients_stats(filename,list_id))
 
 if __name__ == "__main__":
     main()
