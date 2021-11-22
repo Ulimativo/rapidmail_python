@@ -16,6 +16,7 @@ from requests.auth import HTTPBasicAuth
 import json
 from datetime import datetime
 import pandas as pd
+import os
 
 # CONFIGURATION
 config=dotenv_values(".env") # config = {"RAPIDMAIL_USERNAME" : "username", "RAPIDMAIL_PASSWORD" : "password"}
@@ -26,6 +27,7 @@ class APIBasic():
           self.base_url="https://apiv3.emailsys.net"
           self.endpoint={
                "apiusers":f"{self.base_url}/v1/apiusers",
+               "mailings":f"{self.base_url}/v1/mailings",
                "recipientslists":f"{self.base_url}/v1/recipientlists",
                "blacklist":f"{self.base_url}/v1/blacklist",
                "forms":f"{self.base_url}/v2/forms",
@@ -118,11 +120,27 @@ class Mailings(APIBasic):
      """
      def __init__(self) -> None:
           super().__init__()
+          #self.mailings=self.get_request(self.endpoint['mailings']).json()
+          self.all_mailings=self.get_all_results()
+
+     def __str_(self) -> str:
+          return super().__str__()
+
+     def get_all_results(self):
           self.mailings=self.get_request(self.endpoint['mailings']).json()
-          
-          def __str_(self) -> str:
-               return super().__str__()
-         
+          mailing_list=self.mailings['_embedded']['mailings']
+          next_key=self.mailings['_links']['next']['href']
+          while next_key:
+               print("Next Found!")
+               print(next_key)
+               self.mailings=self.get_request(next_key).json()
+               mailing_list.extend(self.mailings['_embedded']['mailings'])
+               try:
+                    next_key=self.mailings['_links']['next']['href']    
+                    continue
+               except:
+                    break
+          return mailing_list
 
 class Mailing(APIBasic):
      """
@@ -143,7 +161,6 @@ TO-DOS:
 
 """
 
-
 ########################################################################
 # TESTING
 #print(Forms())
@@ -155,18 +172,21 @@ TO-DOS:
 
 def save_mailing_stats(filename):
      mailing_list=[]
-     for elem in Mailings().mailings['_embedded']['mailings']:
+     for elem in Mailings().all_mailings:
           main_stat=elem
           detail_stat=Mailing(elem['id']).mail_stats
           main_stat.update(detail_stat)
           mailing_list.append(main_stat)
      mainframe=pd.DataFrame.from_dict(mailing_list)
-     mainframe.to_csv(f"{filename}.csv", index=False)
+     mainframe.to_csv(os.path.join('files/'+f"{filename}.csv"), index=False)
      return f"Finished, saved to file {filename}.csv"
 
 def main():
-     print(save_mailing_stats('mailings'))
-
+     #print(save_mailing_stats('mailings'))
+     #print(json.dumps(Mailings().get_all_results, indent=2))
+     #test=Mailings()
+     print(save_mailing_stats('testfull'))
+     
 if __name__ == "__main__":
      main()
 
