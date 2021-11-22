@@ -15,6 +15,7 @@ from requests.auth import HTTPBasicAuth
 # Additional Libraries
 import json
 from datetime import datetime
+import pandas as pd
 
 # CONFIGURATION
 config=dotenv_values(".env") # config = {"RAPIDMAIL_USERNAME" : "username", "RAPIDMAIL_PASSWORD" : "password"}
@@ -111,11 +112,61 @@ class Recipientlist(APIBasic):
           query_params={'from':self.creation_date, 'to':today, 'status':'active'}
           return self.get_request_params(f"{self.endpoint['recipientslists']}/{self.list_id}/stats/activity", query_params)          
 
+class Mailings(APIBasic):
+     """
+     Class representing Mailing object from API.
+     """
+     def __init__(self) -> None:
+          super().__init__()
+          self.mailings=self.get_request(self.endpoint['mailings']).json()
+          
+          def __str_(self) -> str:
+               return super().__str__()
+         
+
+class Mailing(APIBasic):
+     """
+     Class for detailes mailing statistics
+     """
+     def __init__(self, mailing_id) -> None:
+          super().__init__()
+          self.mail_stats=self.get_mailing_stats(mailing_id)
+
+     def get_mailing_stats(self, mailing_id):
+          endpoint_url=f"{self.endpoint['mailings']}/{mailing_id}/stats"
+          return self.get_request(endpoint_url).json()
+
+
+"""
+TO-DOS:
+- include all pages - currently only reading page 1.
+
+"""
+
 
 ########################################################################
+# TESTING
 #print(Forms())
 #print(APIBasic().list_api_users()) 
 #print(APIUser(10345))
 #print(Recipientlists())
 #print(json.dumps(Recipientlist(5613).details, indent=2))
 #########################################################################
+
+def save_mailing_stats(filename):
+     mailing_list=[]
+     for elem in Mailings().mailings['_embedded']['mailings']:
+          main_stat=elem
+          detail_stat=Mailing(elem['id']).mail_stats
+          main_stat.update(detail_stat)
+          mailing_list.append(main_stat)
+     mainframe=pd.DataFrame.from_dict(mailing_list)
+     mainframe.to_csv(f"{filename}.csv", index=False)
+     return f"Finished, saved to file {filename}.csv"
+
+def main():
+     print(save_mailing_stats('mailings'))
+
+if __name__ == "__main__":
+     main()
+
