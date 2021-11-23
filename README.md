@@ -1,11 +1,13 @@
-# rapidmail-api 
+# rapidmail-api
+
 ## Python Module for the Newsletter Tool Rapidmail
------
 
-**rapidmail-api** is a Python library for dealing with the [Rapidmail](https://www.rapidmail.de) Newsletter Tool API.  
+---
 
-***Disclaimer***:  
-This project is in no way affiliated with Rapidmail despite myself being a user of the tool.     
+**rapidmail-api** is a Python library for dealing with the [Rapidmail](https://www.rapidmail.de) Newsletter Tool API.
+
+**_Disclaimer_**:  
+This project is in no way affiliated with Rapidmail despite myself being a user of the tool.
 
 ## Installation
 
@@ -18,10 +20,12 @@ pip install rapidmail-api
 ## Configuration
 
 rapidmail-api expects an .env file with two variables, and uses dotenv to read the file:
-- RAPIDMAIL_USERNAME
-- RAPIDMAIL_PASSWORD
 
-You need to sign-up for Rapidmail and generate an API user to access the API. 
+- RAPIDMAIL_USERNAME -> the Rapidmail API username
+- RAPIDMAIL_PASSWORD -> the Rapidmail API password
+- FILE_PATH -> the path to save generated files
+
+You need to sign-up for Rapidmail and generate an API username and password to access the API.
 Website: [https://www.rapidmail.de/](https://www.rapidmail.de/)
 
 ## Usage
@@ -31,17 +35,22 @@ import rapidmail
 
 # returns infos on all recipientlists
 print(rapidmail.Recipientlists())
+
+# generates and saves a file with alle recipients from a specific list
+rapidmail.save_recipients_stats(filename -> STR, list_id -> INT)
 ```
 
 ## API Documentation
+
 The Rapidmail API documentation can be found on their developers website:
 [https://developer.rapidmail.wiki](https://developer.rapidmail.wiki)
 
 ## Contributing
+
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
 
 Please make sure to update tests as appropriate.
 
 ## License
-[MIT](https://choosealicense.com/licenses/mit/)
 
+[MIT](https://choosealicense.com/licenses/mit/)

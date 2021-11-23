@@ -13,7 +13,6 @@ import requests
 from requests.auth import HTTPBasicAuth
 
 # Additional Libraries
-import json
 from datetime import datetime
 import pandas as pd
 import os
@@ -24,9 +23,9 @@ config = dotenv_values(".env")
 
 
 class APIBasic():
-    """ 
-    Basic API class handling API calls. 
-    
+    """
+    Basic API class handling API calls.
+
     Methods
     --------
     get_request(endpoint=String)
@@ -39,6 +38,7 @@ class APIBasic():
     prints list of API users, including last time of update
 
     """
+
     def __init__(self) -> None:
         self.base_url = "https://apiv3.emailsys.net"
         self.endpoint = {
@@ -134,6 +134,7 @@ class Recipientlist(APIBasic):
     """
     Class providing details of a given recipient list id.
     """
+
     def __init__(self, list_id) -> None:
         super().__init__()
         self.list_id = list_id
@@ -199,39 +200,36 @@ class Mailing(APIBasic):
         endpoint_url = f"{self.endpoint['mailings']}/{mailing_id}/stats"
         return self.get_request(endpoint_url).json()
 
+
 class Recipient(APIBasic):
 
-     def __init__(self, list_id) -> None:
-          super().__init__()
-          self.details=self.get_recipients(list_id)
+    def __init__(self, list_id) -> None:
+        super().__init__()
+        self.details = self.get_recipients(list_id)
 
-     def get_recipients(self, list_id):
-          query_params={'recipientlist_id':list_id}
-          self.recipients=self.get_request_params(self.endpoint['recipients'], query_params).json()
-          recipients_list=self.recipients['_embedded']['recipients']
-          next_key=self.recipients['_links']['next']['href']
-          while next_key:
-               self.recipients=self.get_request(next_key).json()
-               recipients_list.extend(self.recipients['_embedded']['recipients'])
-               try:
-                    next_key=self.recipients['_links']['next']['href']
-                    continue
-               except:
-                    break
-          return recipients_list
+    def get_recipients(self, list_id):
+        query_params = {'recipientlist_id': list_id}
+        self.recipients = self.get_request_params(
+            self.endpoint['recipients'], query_params).json()
+        recipients_list = self.recipients['_embedded']['recipients']
+        next_key = self.recipients['_links']['next']['href']
+        while next_key:
+            self.recipients = self.get_request(next_key).json()
+            recipients_list.extend(self.recipients['_embedded']['recipients'])
+            try:
+                next_key = self.recipients['_links']['next']['href']
+                continue
+            except:
+                break
+        return recipients_list
 
 
-"""
-TO-DOS:
-x include all pages - currently only reading page 1.
-     done for Mailings & Recipients
-"""
-
+# TODO: include all pages - currently only reading page 1. Done for mailings an recipients
 ########################################################################
-# TESTING
+# * TESTING
 # print(APIUser(10345))
 # print(Recipientlists())
-#print(json.dumps(Recipientlist(5613).details, indent=2))
+# print(json.dumps(Recipientlist(5613).details, indent=2))
 #########################################################################
 
 
@@ -243,23 +241,31 @@ def save_mailing_stats(filename):
         main_stat.update(detail_stat)
         mailing_list.append(main_stat)
     mainframe = pd.DataFrame.from_dict(mailing_list)
-    mainframe.to_csv(os.path.join('files/'+f"{filename}.csv"), index=False)
-    return f"Finished, saved to file {filename}.csv"
+    return df_to_csv(mainframe, filename)
+
 
 def save_recipients_stats(filename, list_id):
-     recipients=Recipient(list_id).details
-     mainframe = pd.DataFrame.from_dict(recipients)
-     # drop personal data columns to anonymize the dataset
-     mainframe.drop(columns=['email','firstname', 'lastname','title'], inplace=True)
-     mainframe.to_csv(os.path.join('files/'+f"{filename}.csv"), index=False)
-     return f"Finished, saved to file {filename}.csv"
+    recipients = Recipient(list_id).details
+    mainframe = pd.DataFrame.from_dict(recipients)
+    # * drop personal data columns to anonymize the dataset
+    # * important for GDPR compliance
+    mainframe.drop(columns=['email', 'firstname',
+                   'lastname', 'title'], inplace=True)
+    return df_to_csv(mainframe, filename)
+
+def df_to_csv(dataframe, filename):
+    dataframe.to_csv(os.path.join(
+        config['FILE_PATH']+f"{filename}.csv"), index=False)
+    return f"Finished - saved CSV to: {filename}.csv"
+
 
 def main():
-    filename=input("What filename do you want to save the data to? ")
-    list_id=input("Which List ID to pull data from? ")
+    filename = input("What filename do you want to save the data to? ")
+    list_id = input("Which List ID to pull data from? ")
     # list_id=5677
     print(f"Data from {list_id} will be saved to {filename}.csv)")
-    print(save_recipients_stats(filename,list_id))
+    print(save_recipients_stats(filename, list_id))
+
 
 if __name__ == "__main__":
     main()
