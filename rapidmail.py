@@ -253,6 +253,7 @@ def save_recipients_stats(filename, list_id):
                    'lastname', 'title'], inplace=True)
     return df_to_csv(mainframe, filename)
 
+
 def df_to_csv(dataframe, filename):
     dataframe.to_csv(os.path.join(
         config['FILE_PATH']+f"{filename}.csv"), index=False)
