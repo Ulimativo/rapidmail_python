@@ -12,7 +12,7 @@ from dotenv import dotenv_values
 import requests
 from requests.auth import HTTPBasicAuth
 
-# Additional Libraries
+# Optional Libraries
 from datetime import datetime
 import pandas as pd
 import os
@@ -50,18 +50,12 @@ class APIBasic():
             "forms": f"{self.base_url}/v2/forms",
         }
 
-    def get_request(self, endpoint):
-        # returns response of requests as object
-        return requests.get(endpoint, auth=HTTPBasicAuth(config['RAPIDMAIL_USERNAME'], config['RAPIDMAIL_PASSWORD']))
-
-    def get_request_params(self, endpoint, query_params):
-        # returns response of requests with query parameters as object
-        return requests.get(endpoint, params=query_params, auth=HTTPBasicAuth(config['RAPIDMAIL_USERNAME'], config['RAPIDMAIL_PASSWORD']))
-
-    def __str__(self) -> str:
-        # sends request and prints connection status to the console
-        response = self.get_request(self.endpoint['apiusers'])
-        return f" Connection status: {response.status_code} - {response.reason}"
+    def get_request(self, endpoint, query_params=None):
+        # returns response of requests as object, either with query parameters or without.
+        if query_params==None:
+            return requests.get(endpoint, auth=HTTPBasicAuth(config['RAPIDMAIL_USERNAME'], config['RAPIDMAIL_PASSWORD']))
+        else:
+            return requests.get(endpoint, params=query_params, auth=HTTPBasicAuth(config['RAPIDMAIL_USERNAME'], config['RAPIDMAIL_PASSWORD']))
 
     def list_api_users(self):
         # fetch and list all api users by ID, Name and Last Updated Timestamp
@@ -69,6 +63,14 @@ class APIBasic():
         for api_user in api_user_list['_embedded']['apiusers']:
             print(
                 f"{api_user['id']} - {api_user['description']} - last updated: {api_user['updated']}")
+
+    def __str__(self) -> str:
+        """
+        sends request and prints connection status to the console, e.g. for connection tests
+        simplest usage: print(APIBasic())
+        """
+        response = self.get_request(self.endpoint['apiusers'])
+        return f" Connection status: {response.status_code} - {response.reason}"
 
 
 class APIUser(APIBasic):
@@ -152,7 +154,7 @@ class Recipientlist(APIBasic):
         today = datetime.today().strftime('%Y-%m-%d')
         query_params = {'from': self.creation_date,
                         'to': today, 'status': 'active'}
-        return self.get_request_params(f"{self.endpoint['recipientslists']}/{self.list_id}/stats/activity", query_params)
+        return self.get_request(f"{self.endpoint['recipientslists']}/{self.list_id}/stats/activity", query_params)
 
 
 class Mailings(APIBasic):
@@ -209,7 +211,7 @@ class Recipient(APIBasic):
 
     def get_recipients(self, list_id):
         query_params = {'recipientlist_id': list_id}
-        self.recipients = self.get_request_params(
+        self.recipients = self.get_request(
             self.endpoint['recipients'], query_params).json()
         recipients_list = self.recipients['_embedded']['recipients']
         next_key = self.recipients['_links']['next']['href']
@@ -261,6 +263,12 @@ def df_to_csv(dataframe, filename):
 
 
 def main():
+
+    #print(APIBasic())
+    #print(APIBasic.list_api_users())
+    #test=Recipientlist(5677)
+    #print(test.details)
+
     filename = input("What filename do you want to save the data to? ")
     list_id = input("Which List ID to pull data from? ")
     # list_id=5677
