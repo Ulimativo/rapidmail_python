@@ -4,6 +4,7 @@
 
 ### Project related ###
 files/
+datamanager.py
 
 ### dotenv ###
 .env
