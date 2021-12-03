@@ -67,7 +67,7 @@ class APIBasic():
     def __str__(self) -> str:
         """
         sends request and prints connection status to the console, e.g. for connection tests
-        simplest usage: print(APIBasic())
+        usage example: print(APIBasic())
         """
         response = self.get_request(self.endpoint['apiusers'])
         return f" Connection status: {response.status_code} - {response.reason}"
@@ -90,8 +90,7 @@ class APIUser(APIBasic):
 
 class Blacklist(APIBasic):
     """
-    Class handling blacklist entries
-    not implemented yet.
+    TODO Class handling blacklist entries
     """
 
     def __init__(self) -> None:
@@ -104,8 +103,7 @@ class Blacklist(APIBasic):
 
 class Forms(APIBasic):
     """
-    Class handling form lists
-    not implemented yet
+    TODO Class handling form lists
     """
 
     def __init__(self) -> None:
@@ -234,7 +232,11 @@ class Recipient(APIBasic):
 # print(json.dumps(Recipientlist(5613).details, indent=2))
 #########################################################################
 
-
+"""
+! Section for data and file management
+! under construction
+TODO make this own class, either in this module or in separate
+"""
 def save_mailing_stats(filename):
     mailing_list = []
     for elem in Mailings().all_mailings:

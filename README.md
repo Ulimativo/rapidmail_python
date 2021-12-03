@@ -31,13 +31,20 @@ Website: [https://www.rapidmail.de/](https://www.rapidmail.de/)
 ## Usage
 
 ```python
-import rapidmail
+import rapidmail as rm
+
+# test connection
+print(rm.APIBasic())
+
+# list API users
+users=rm.APIBasic()
+print(users.list_api_users())
 
 # returns infos on all recipientlists
-print(rapidmail.Recipientlists())
+print(rm.Recipientlists())
 
 # generates and saves a file with alle recipients from a specific list
-rapidmail.save_recipients_stats(filename -> STR, list_id -> INT)
+rm.save_recipients_stats(filename -> STR, list_id -> INT)
 ```
 
 ## API Documentation
