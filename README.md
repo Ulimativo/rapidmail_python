@@ -11,6 +11,7 @@ This project is in no way affiliated with Rapidmail despite myself being a user 
 
 **This is still work in progress and far from being completed**
 
+<!--
 ## Installation
 
 Use the package manager [pip](https://pip.pypa.io/en/stable/) to install rapidmail-api.
@@ -18,6 +19,7 @@ Use the package manager [pip](https://pip.pypa.io/en/stable/) to install rapidma
 ```bash
 pip install rapidmail-api
 ```
+-->
 
 ## Configuration
 
