@@ -52,7 +52,7 @@ class APIBasic():
 
     def get_request(self, endpoint, query_params=None):
         # returns response of requests as object, either with query parameters or without.
-        if query_params==None:
+        if query_params == None:
             return requests.get(endpoint, auth=HTTPBasicAuth(config['RAPIDMAIL_USERNAME'], config['RAPIDMAIL_PASSWORD']))
         else:
             return requests.get(endpoint, params=query_params, auth=HTTPBasicAuth(config['RAPIDMAIL_USERNAME'], config['RAPIDMAIL_PASSWORD']))
@@ -225,18 +225,14 @@ class Recipient(APIBasic):
 
 
 # TODO: include all pages - currently only reading page 1. Done for mailings an recipients
-########################################################################
-# * TESTING
-# print(APIUser(10345))
-# print(Recipientlists())
-# print(json.dumps(Recipientlist(5613).details, indent=2))
-#########################################################################
 
 """
 ! Section for data and file management
 ! under construction
 TODO make this own class, either in this module or in separate
 """
+
+
 def save_mailing_stats(filename):
     mailing_list = []
     for elem in Mailings().all_mailings:
@@ -266,14 +262,8 @@ def df_to_csv(dataframe, filename):
 
 def main():
 
-    #print(APIBasic())
-    #print(APIBasic.list_api_users())
-    #test=Recipientlist(5677)
-    #print(test.details)
-
     filename = input("What filename do you want to save the data to? ")
     list_id = input("Which List ID to pull data from? ")
-    # list_id=5677
     print(f"Data from {list_id} will be saved to {filename}.csv)")
     print(save_recipients_stats(filename, list_id))
 
