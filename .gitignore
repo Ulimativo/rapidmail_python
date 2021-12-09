@@ -48,6 +48,5 @@ env/share/python-wheels/six-1.12.0-py2.py3-none-any.whl
 env/share/python-wheels/urllib3-1.24.1-py2.py3-none-any.whl
 env/share/python-wheels/webencodings-0.5.1-py2.py3-none-any.whl
 env/share/python-wheels/wheel-0.32.3-py2.py3-none-any.whl
-__pycache__/rapidmail.cpython-37.pyc
-__pycache__/rapidmail.cpython-37.pyc
+__pycache__/
 workspace.code-workspace
