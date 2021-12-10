@@ -3,6 +3,10 @@
 # v. 0.2 - Alpha                       #
 ########################################
 
+# TODO: include all pages - currently only reading page 1. Done for mailings an recipients
+# TODO: Add database functionality
+# TODO: add delta-loading, so only new entries are added, if used with database
+
 # IMPORTS
 
 # General imports
@@ -224,7 +228,7 @@ class Recipient(APIBasic):
         return recipients_list
 
 
-# TODO: include all pages - currently only reading page 1. Done for mailings an recipients
+
 
 """
 ! Section for data and file management
